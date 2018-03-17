@@ -5,24 +5,20 @@ package boitzo;
 
 
 import org.json.simple.*;
-import org.json.simple.parser.JSONParser;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+
 import java.util.Scanner;
 
 
 
 public class JsonSupply {
-     private  static int countOfAlternatives;
+     private   int countOfAlternatives;
 
-     private static ArrayList<String> alteratives=new ArrayList<>();
-     private static ArrayList<Double> makeMatrix(){
+     private  ArrayList<String> alteratives=new ArrayList<>();
+     private  ArrayList<Double> makeMatrix(){
          Scanner scanner=new Scanner(System.in);
          JSONArray matrixOfPreferences=new JSONArray();
         Double answer;
@@ -42,7 +38,7 @@ public class JsonSupply {
          }
          return matrixOfPreferences;
      }
-    private static JSONObject makeGoal(JSONObject object){
+    private  JSONObject makeGoal(JSONObject object){
         System.out.println("podaj cel");
         Scanner scanner=new Scanner(System.in);
         JSONObject goal=new JSONObject();
@@ -54,7 +50,7 @@ public class JsonSupply {
         return object;
     }
 
-    private static JSONObject makeCriteria(JSONObject mainJson){
+    private  JSONObject makeCriteria(JSONObject mainJson){
         JSONArray jsonArray=new JSONArray();
 
         int howmany;
@@ -84,7 +80,7 @@ public class JsonSupply {
         return mainJson;
     }
 
-    public static JSONObject makeMainPartOfJSON() throws IOException {
+    public  JSONObject makeMainPartOfJSON() throws IOException {
         JSONObject jsonMain=new JSONObject();
         Scanner scanner=new Scanner(System.in);
 
@@ -106,15 +102,21 @@ public class JsonSupply {
 
         return jsonMain;
     }
-    public static void main(String [] arg) throws IOException {
-
-        JSONObject jsonObject=makeMainPartOfJSON();
-        try (FileWriter file = new FileWriter("myJSO.json")) {
+    public  static void toFile(JSONObject jsonObject,String path){
+        try (FileWriter file = new FileWriter(path)) {
             file.write(jsonObject.toJSONString());
             System.out.println("Successfully Copied JSON Object to File...");
             System.out.println("\nJSON Object: " + jsonObject);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
+    }
+    public static void main(String [] arg) throws IOException {
+
+        JSONObject jsonObject=new JsonSupply().makeMainPartOfJSON();
+
+        JsonSupply.toFile(jsonObject,"boitzo.json");
         System.out.println(jsonObject.toString());
     }
     }
