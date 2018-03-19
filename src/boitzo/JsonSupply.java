@@ -15,22 +15,25 @@ import java.util.Scanner;
 
 
 public class JsonSupply {
-     private   int countOfAlternatives;
+    private   int countOfAlternatives;
 
-     private  ArrayList<String> alteratives=new ArrayList<>();
-     private  ArrayList<Double> makeMatrix(){
+    private  ArrayList<String> alteratives=new ArrayList<>();
+
+     private  ArrayList<Double> makeMatrix(JSONArray arrayOfChildren){
          Scanner scanner=new Scanner(System.in);
          JSONArray matrixOfPreferences=new JSONArray();
         Double answer;
-         for (int j = 0; j <countOfAlternatives ; j++) {
+        int countOfChildren=arrayOfChildren.size();
+
+         for (int j = 0; j <countOfChildren ; j++) {
              ArrayList<Double> row = new ArrayList<>();
-             for (int k = 0; k < countOfAlternatives; k++) {
+             for (int k = 0; k < countOfChildren; k++) {
                  if (j == k) {
                      row.add(1.0);
                      continue;
                  } else {
-                     System.out.println("Podaj stosunek " + alteratives.get(j) + "/" + alteratives.get(k));
-                     answer = scanner.nextDouble();
+                     System.out.println("Podaj stosunek " +((JSONObject)arrayOfChildren.get(j)).get("name") + "/" + ((JSONObject)arrayOfChildren.get(k)).get("name"));
+                     answer = Validation.getDouble();
                      row.add(answer);
                  }
              }
@@ -38,13 +41,34 @@ public class JsonSupply {
          }
          return matrixOfPreferences;
      }
+    private  ArrayList<Double> makeMatrix(){
+        Scanner scanner=new Scanner(System.in);
+        JSONArray matrixOfPreferences=new JSONArray();
+        Double answer;
+        for (int j = 0; j <countOfAlternatives ; j++) {
+            ArrayList<Double> row = new ArrayList<>();
+            for (int k = 0; k < countOfAlternatives; k++) {
+                if (j == k) {
+                    row.add(1.0);
+                    continue;
+                } else {
+                    System.out.println("Podaj stosunek " + alteratives.get(j) + "/" + alteratives.get(k));
+                    answer = Validation.getDouble();
+                    row.add(answer);
+                }
+            }
+            matrixOfPreferences.add(row);
+        }
+        return matrixOfPreferences;
+    }
     private  JSONObject makeGoal(JSONObject object){
         System.out.println("podaj cel");
         Scanner scanner=new Scanner(System.in);
         JSONObject goal=new JSONObject();
         goal.put("name",scanner.next());
-        goal.put("preferences",makeMatrix());
+
         goal=makeCriteria(goal);
+        goal.put("preferences",makeMatrix((JSONArray)(goal.get("children"))));
         object.put("goal",goal);
 
         return object;
@@ -55,23 +79,26 @@ public class JsonSupply {
 
         int howmany;
         ArrayList<JSONObject> listWithJsons=new ArrayList<>();
-        System.out.println("podaj ilosc kryteriów");
+        System.out.println(mainJson.get("name")+": podaj ilosc kryteriów");
         Scanner scanner=new Scanner(System.in);
 
-        howmany=scanner.nextInt();
+        howmany=Validation.getInteger();
         for (int i = 0; i <howmany ; i++) {
             JSONObject jsonGoal=new JSONObject();
 
-            System.out.println("podaj nazwe kryterium");
+            System.out.println(mainJson.get("name")+": podaj nazwe kryterium");
             jsonGoal.put("name",scanner.next());
-
-
-            jsonGoal.put("preferences",makeMatrix());
-            System.out.println("Czy schodzimy w głąb? [t/n]");
+            System.out.println(jsonGoal.get("name")+": Czy schodzimy w głąb? [t/n]");
             Character answer=scanner.next().charAt(0);
             jsonGoal.put("children",new JSONArray());
+            if (answer.equals('t')) {
+                jsonGoal=makeCriteria(jsonGoal);
+                jsonGoal.put("preferences",makeMatrix(((JSONArray)jsonGoal.get("children"))));
+            }
+            else jsonGoal.put("preferences",makeMatrix());
 
-            if (answer.equals('t')) jsonGoal=makeCriteria(jsonGoal);
+
+
             jsonArray.add(jsonGoal);
 
         }
@@ -85,7 +112,7 @@ public class JsonSupply {
         Scanner scanner=new Scanner(System.in);
 
         System.out.println("Podaj ilosc mozliwosci");
-        int howmany=scanner.nextInt();
+        int howmany=Validation.getInteger();
         JSONArray jsonArray=new JSONArray();
         countOfAlternatives=howmany;
 
@@ -116,7 +143,7 @@ public class JsonSupply {
 
         JSONObject jsonObject=new JsonSupply().makeMainPartOfJSON();
 
-        JsonSupply.toFile(jsonObject,"boitzo.json");
+        JsonSupply.toFile(jsonObject,"alternate.json");
         System.out.println(jsonObject.toString());
     }
     }
