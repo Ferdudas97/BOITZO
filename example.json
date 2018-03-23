@@ -1,0 +1,19 @@
+{"goal":
+  {
+    "preferences":[[1.0,0.8],[1.25,1.0]],
+    "children":[
+      {"preferences":[[1.0,3.0],[2.0,1.0]],
+        "children":[
+          {"preferences":[[1.0,2.0,1.5],[2.0,1.0,3.0],[4.0,2.0,1.0]],
+            "children":"alternatives","name":"Hotel"},
+          {"preferences":[[1.0,0.6666666666666666,2.3],[2.0,1.0,1.0],[3.0,4.0,1.0]],
+            "children":"alternatives","name":"Transport"}]
+      ,"name":"Cena"},
+      {"preferences":[[1.0,2.0,3.0],[0.5,1.0,0.8],[1.5,0.8333333333333334,1.0]],
+        "children":"alternatives",
+        "name":"Atrakcje"}
+    ],
+    "name":"Wakacje"
+  },
+  "alternatives":["Barcelona","Paryż","Mediolan"]
+}
