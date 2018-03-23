@@ -5,9 +5,15 @@ package boitzo;
 
 
 import org.json.simple.*;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import java.util.Scanner;
@@ -88,22 +94,25 @@ public class JsonSupply {
 
             System.out.println(mainJson.get("name")+": podaj nazwe kryterium");
             jsonGoal.put("name",scanner.next());
-            System.out.println(jsonGoal.get("name")+": Czy schodzimy w głąb? [t/n]");
+            System.out.println(jsonGoal.get("name")+": Czy dodajemy subkryterium? [t/n]");
             Character answer=scanner.next().charAt(0);
             jsonGoal.put("children",new JSONArray());
             if (answer.equals('t')) {
                 jsonGoal=makeCriteria(jsonGoal);
                 jsonGoal.put("preferences",makeMatrix(((JSONArray)jsonGoal.get("children"))));
             }
-            else jsonGoal.put("preferences",makeMatrix());
+            else{
+                jsonGoal.put("preferences",makeMatrix());
+                jsonGoal.put("children","alternatives");
+            }
 
 
 
             jsonArray.add(jsonGoal);
 
         }
+         mainJson.put("children",jsonArray);
 
-        mainJson.put("children",jsonArray);
         return mainJson;
     }
 
@@ -139,11 +148,13 @@ public class JsonSupply {
         }
 
     }
-    public static void main(String [] arg) throws IOException {
+
+
+    public static void main(String [] arg) throws IOException, ParseException {
 
         JSONObject jsonObject=new JsonSupply().makeMainPartOfJSON();
 
-        JsonSupply.toFile(jsonObject,"alternate.json");
+        JsonSupply.toFile(jsonObject,"ex3.json");
         System.out.println(jsonObject.toString());
     }
     }
