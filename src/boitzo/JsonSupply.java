@@ -154,7 +154,7 @@ public class JsonSupply {
 
         JSONObject jsonObject=new JsonSupply().makeMainPartOfJSON();
 
-        JsonSupply.toFile(jsonObject,"ex3.json");
+        JsonSupply.toFile(jsonObject,"ex4.json");
         System.out.println(jsonObject.toString());
     }
     }

@@ -1,16 +1,25 @@
 package boitzo;
 
+
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
+import org.ejml.ops.MatrixComponent;
+import org.ejml.simple.SimpleMatrix;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 public class AhpStructure {
     public ArrayList<String> alternatives= new ArrayList<>();
+    private ArrayList<SimpleMatrix> eigenValuesAlternatives= new ArrayList<>();
+    private SimpleMatrix eigenResult;
     public AhpNode goal=new AhpNode();
     private JSONObject jsonObject;
 
@@ -87,14 +96,79 @@ public class AhpStructure {
 
 
     }
-    public AhpStructure(){
-        this.jsonObject=parseJSON("ex3.json");
+    public AhpStructure(String path){
+        this.jsonObject=parseJSON(path);
         addAlternatives();
         addGoal();
     }
+    public void eigenValueMethod(AhpNode node){
+
+        SimpleMatrix eigenVector=prepareEigenValue(node);
+        for (int i = 0; i <node.getChildren().size() ; i++) {
+
+            eigenValueMethod(node.getChildren().get(i),eigenVector.get(i));
+
+        }
+        makeEigenResult();
+
+    }
+
+    private void eigenValueMethod(AhpNode node,double weight){
+        SimpleMatrix eigenVector=prepareEigenValue(node);
+        for (int i = 0; i <eigenVector.numRows() ; i++) {
+            eigenVector.set(i,0,eigenVector.get(i)*weight);
+
+        }
+        for (int i = 0; i <node.getChildren().size() ; i++) {
+            eigenValueMethod(node.getChildren().get(i),eigenVector.get(i));
+
+        }
+        if (node.getChildren().size()==0) {
+            eigenValuesAlternatives.add(eigenVector);
+            eigenVector.print();
+        }
+
+
+
+
+
+    }
+    private void makeEigenResult(){
+        eigenResult=new SimpleMatrix(alternatives.size(),1);
+        for (SimpleMatrix vector: eigenValuesAlternatives) {
+            eigenResult=eigenResult.plus(vector);
+
+        }
+    }
+    public void printEigenResult(){
+        System.out.println("Eigen Value method");
+        System.out.println(eigenResult);
+    }
+
+
+    private SimpleMatrix prepareEigenValue(AhpNode node){
+        SimpleMatrix matrix=new SimpleMatrix(node.getPreferences().size(),node.getPreferences().size());
+        for (int i = 0; i <node.getPreferences().size() ; i++) {
+            for (int j = 0; j <node.getPreferences().size() ; j++) {
+                matrix.setRow(i,j,node.getPreferences().get(i).get(j));
+            }
+        }
+        SimpleMatrix eigenVector=matrix.eig().getEigenVector(matrix.eig().getIndexMax());
+        for (int i = 0; i <eigenVector.numRows() ; i++) {
+            eigenVector.set(i,0,Math.abs(eigenVector.get(i,0)));
+        }
+        double sum=eigenVector.elementSum();
+        for (int i = 0; i <eigenVector.numRows() ; i++) {
+            eigenVector.set(i,0,eigenVector.get(i)/sum);
+        }
+        return eigenVector;
+
+    }
     public static void main(String [] arg){
-        AhpStructure ahpStructure=new AhpStructure();
+        AhpStructure ahpStructure=new AhpStructure("ex3.json");
         ahpStructure.print();
+        ahpStructure.eigenValueMethod(ahpStructure.goal);
+        ahpStructure.printEigenResult();
 
     }
 }

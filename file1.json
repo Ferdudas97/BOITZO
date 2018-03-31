@@ -1,1 +1,87 @@
-{"goal":{"preferences":[[1.0]],"children":[{"preferences":[[1.0]],"children":[],"name":"nic"}],"name":"wakacje"},"alternatives":["tokio"]}
+{
+  "goal": {
+    "children": [
+      {
+        "children": [
+          "audi",
+          "ford"
+        ],
+        "preferences": [
+          [
+            1.0,
+            0.5
+          ],
+          [
+            2.0,
+            1.0
+          ]
+        ],
+        "name": "Cena"
+      },
+      {
+        "children": [
+          {
+            "children": [
+              "audi",
+              "ford"
+            ],
+            "preferences": [
+              [
+                1.0,
+                2.0
+              ],
+              [
+                0.5,
+                1.0
+              ]
+            ],
+            "name": "Alkantara"
+          },
+          {
+            "children": [
+              "audi",
+              "ford"
+            ],
+            "preferences": [
+              [
+                1.0,
+                1.0
+              ],
+              [
+                1.0,
+                1.0
+              ]
+            ],
+            "name": "Klimatyzacja"
+          }
+        ],
+        "preferences": [
+          [
+            1.0,
+            2.0
+          ],
+          [
+            2.0,
+            1.0
+          ]
+        ],
+        "name": "Wyposarzenie"
+      }
+    ],
+    "preferences": [
+      [
+        1.0,
+        2.0
+      ],
+      [
+        0.5,
+        1.0
+      ]
+    ],
+    "name": "Kupno"
+  },
+  "alternatives": [
+    "audi",
+    "ford"
+  ]
+}
