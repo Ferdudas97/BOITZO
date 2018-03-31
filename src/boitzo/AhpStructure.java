@@ -20,6 +20,8 @@ public class AhpStructure {
     public ArrayList<String> alternatives= new ArrayList<>();
     private ArrayList<SimpleMatrix> eigenValuesAlternatives= new ArrayList<>();
     private SimpleMatrix eigenResult;
+    private ArrayList<SimpleMatrix> geometricMeanAlternatives= new ArrayList<>();
+    private SimpleMatrix geometricMeanResult;
     public AhpNode goal=new AhpNode();
     private JSONObject jsonObject;
 
@@ -56,7 +58,6 @@ public class AhpStructure {
     private AhpNode addChildren(AhpNode node,JSONObject child){
 
             node.setName((String)child.get("name"));
-           //System.out.println(node.getName());
 
             node.setPreferences((ArrayList<ArrayList<Double>>)child.get("preferences"));
         if (!child.get("children").equals("alternatives")) {
@@ -91,7 +92,7 @@ public class AhpStructure {
 
         }
         else stringBuilder.append("alternatives");
-        System.out.println(stringBuilder);
+        System.out.println(stringBuilder.toString());
 
 
 
@@ -101,12 +102,12 @@ public class AhpStructure {
         addAlternatives();
         addGoal();
     }
-    public void eigenValueMethod(AhpNode node){
+    public void eigenValueMethod(){
 
-        SimpleMatrix eigenVector=prepareEigenValue(node);
-        for (int i = 0; i <node.getChildren().size() ; i++) {
+        SimpleMatrix eigenVector=prepareEigenValue(goal);
+        for (int i = 0; i <goal.getChildren().size() ; i++) {
 
-            eigenValueMethod(node.getChildren().get(i),eigenVector.get(i));
+            eigenValueMethod(goal.getChildren().get(i),eigenVector.get(i));
 
         }
         makeEigenResult();
@@ -125,14 +126,11 @@ public class AhpStructure {
         }
         if (node.getChildren().size()==0) {
             eigenValuesAlternatives.add(eigenVector);
-            eigenVector.print();
+
         }
 
-
-
-
-
     }
+
     private void makeEigenResult(){
         eigenResult=new SimpleMatrix(alternatives.size(),1);
         for (SimpleMatrix vector: eigenValuesAlternatives) {
@@ -157,18 +155,77 @@ public class AhpStructure {
         for (int i = 0; i <eigenVector.numRows() ; i++) {
             eigenVector.set(i,0,Math.abs(eigenVector.get(i,0)));
         }
-        double sum=eigenVector.elementSum();
-        for (int i = 0; i <eigenVector.numRows() ; i++) {
-            eigenVector.set(i,0,eigenVector.get(i)/sum);
-        }
+
+        eigenVector=eigenVector.divide(eigenVector.elementSum());
         return eigenVector;
 
     }
+    public void geometricMeanMethod(){
+
+        SimpleMatrix geometricMeanVector=prepareGeometricMeanVector(goal);
+        for (int i = 0; i <goal.getChildren().size() ; i++) {
+
+            geometricMeanMethod(goal.getChildren().get(i),geometricMeanVector.get(i));
+
+        }
+        makeGeometricMethodResult();
+
+
+    }
+    private void geometricMeanMethod(AhpNode node,double weight){
+        SimpleMatrix geometicMeanVector=prepareGeometricMeanVector(node);
+        for (int i = 0; i <geometicMeanVector.numRows() ; i++) {
+            geometicMeanVector.set(i,0,geometicMeanVector.get(i)*weight);
+
+        }
+        for (int i = 0; i <node.getChildren().size() ; i++) {
+            geometricMeanMethod(node.getChildren().get(i),geometicMeanVector.get(i));
+
+        }
+        if (node.getChildren().size()==0) {
+            geometricMeanAlternatives.add(geometicMeanVector);
+
+        }
+
+    }
+    private SimpleMatrix prepareGeometricMeanVector(AhpNode node){
+        SimpleMatrix geometricMeanVector=new SimpleMatrix(node.getPreferences().size(),1);
+        double mean=1.0;
+        double sum=0.0;
+        for (int i = 0; i <node.getPreferences().size() ; i++) {
+            for (int j = 0; j <node.getPreferences().size() ; j++) {
+                mean=mean*node.getPreferences().get(i).get(j);
+
+            }
+            sum+=mean;
+           // System.out.println(mean);
+
+            geometricMeanVector.set(i,0,mean);
+            mean=1.0;
+        }
+        geometricMeanVector=geometricMeanVector.divide(sum);
+
+        return geometricMeanVector;
+
+    }
+    private void makeGeometricMethodResult(){
+        geometricMeanResult=new SimpleMatrix(alternatives.size(),1);
+        for (SimpleMatrix vector: geometricMeanAlternatives) {
+            geometricMeanResult=geometricMeanResult.plus(vector);
+
+        }
+    }
+    public void printGeometricMethodResult(){
+        System.out.println("Geometric mean result");
+        geometricMeanResult.print();
+    }
     public static void main(String [] arg){
-        AhpStructure ahpStructure=new AhpStructure("ex3.json");
+        AhpStructure ahpStructure=new AhpStructure("ahp.json");
         ahpStructure.print();
-        ahpStructure.eigenValueMethod(ahpStructure.goal);
+        ahpStructure.eigenValueMethod();
         ahpStructure.printEigenResult();
+        ahpStructure.geometricMeanMethod();
+        ahpStructure.printGeometricMethodResult();
 
     }
 }
