@@ -1,9 +1,6 @@
 package boitzo;
 
 
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
-import org.ejml.ops.MatrixComponent;
 import org.ejml.simple.SimpleMatrix;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -140,7 +137,11 @@ public class AhpStructure {
     }
     public void printEigenResult(){
         System.out.println("Eigen Value method");
-        System.out.println(eigenResult);
+       // System.out.println(eigenResult);
+        for (int i = 0; i <eigenResult.numRows() ; i++) {
+            System.out.println(eigenResult.get(i,0));
+
+        }
     }
 
 
@@ -153,10 +154,12 @@ public class AhpStructure {
         }
         SimpleMatrix eigenVector=matrix.eig().getEigenVector(matrix.eig().getIndexMax());
         for (int i = 0; i <eigenVector.numRows() ; i++) {
+            //if (eigenVector.get(i,0)<0) throw new VectorHasNegativeValue();
             eigenVector.set(i,0,Math.abs(eigenVector.get(i,0)));
         }
 
         eigenVector=eigenVector.divide(eigenVector.elementSum());
+        eigenVector.print();
         return eigenVector;
 
     }
@@ -197,6 +200,8 @@ public class AhpStructure {
                 mean=mean*node.getPreferences().get(i).get(j);
 
             }
+            mean=Math.pow(mean,1.0/node.getPreferences().size());
+
             sum+=mean;
            // System.out.println(mean);
 
@@ -217,10 +222,13 @@ public class AhpStructure {
     }
     public void printGeometricMethodResult(){
         System.out.println("Geometric mean result");
-        geometricMeanResult.print();
+        for (int i = 0; i <geometricMeanResult.numRows() ; i++) {
+            System.out.println(geometricMeanResult.get(i,0));
+        }
+        //geometricMeanResult.print();
     }
     public static void main(String [] arg){
-        AhpStructure ahpStructure=new AhpStructure("ahp.json");
+        AhpStructure ahpStructure=new AhpStructure("ex3.json");
         ahpStructure.print();
         ahpStructure.eigenValueMethod();
         ahpStructure.printEigenResult();

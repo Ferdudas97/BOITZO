@@ -5,15 +5,15 @@ package boitzo;
 
 
 import org.json.simple.*;
-import org.json.simple.parser.JSONParser;
+
 import org.json.simple.parser.ParseException;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+
+
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+
 import java.util.ArrayList;
 
 import java.util.Scanner;
@@ -154,7 +154,7 @@ public class JsonSupply {
 
         JSONObject jsonObject=new JsonSupply().makeMainPartOfJSON();
 
-        JsonSupply.toFile(jsonObject,"ex4.json");
+        JsonSupply.toFile(jsonObject,"ex5.json");
         System.out.println(jsonObject.toString());
     }
     }
